@@ -57,6 +57,7 @@ augroup WrapLineInTeXFile
     autocmd FileType markdown setlocal wrap
 augroup END
 
+set cursorline
 set nowrap
 set number
 
