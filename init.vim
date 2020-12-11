@@ -1,4 +1,4 @@
-let g:python3_host_prog = "/usr/bin/python3"
+let g:python3_host_prog = "/usr/local/bin/python3"
 
 
 " Plugins
@@ -25,6 +25,9 @@ Plug 'preservim/nerdcommenter'
 
 " Themes
 Plug 'mhartington/oceanic-next'
+Plug 'NieTiger/halcyon-neovim'
+Plug 'morhetz/gruvbox'
+Plug 'lifepillar/vim-solarized8'
 
 
 " Syntax highlighting
@@ -39,8 +42,19 @@ call plug#end()
 
 """""""""""""""""""""""
 " Plugin settings
+
+
+" vim-arline settings
 let g:airline#extensions#tabline#enabled = 1
 
+" remove git info 
+let g:airline_section_b = ''
+
+" only show the number of lines, and nothing else
+let g:airline_section_z = airline#section#create(['%L', ' ', 'ln'])
+
+" remove separators for empty sections
+let g:airline_skip_empty_sections = 1
 
 
 " General Settings
@@ -49,13 +63,20 @@ if has('termguicolors')
   set termguicolors
 endif
 
-syntax enable
-colorscheme OceanicNext
 
-augroup WrapLineInTeXFile
+syntax enable
+
+" colorscheme solarized8
+" colorscheme gruvbox
+colorscheme OceanicNext
+" colorscheme halcyon
+
+
+augroup WrapLineInMdFile
     autocmd!
     autocmd FileType markdown setlocal wrap
 augroup END
+
 
 set cursorline
 set nowrap
@@ -65,6 +86,9 @@ set cmdheight=2
 
 " https://vim.fandom.com/wiki/Vim_buffer_FAQ#hidden
 set hidden
+
+
+
 
 " show space characters
 " set list
@@ -86,7 +110,12 @@ autocmd FileType typescript setlocal shiftwidth=2 tabstop=2
 autocmd FileType typescriptreact setlocal shiftwidth=2 tabstop=2
 autocmd FileType json setlocal shiftwidth=2 tabstop=2
 autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
+autocmd FileType prisma setlocal shiftwidth=2 tabstop=2
 
+
+" Highlight Current Line Number
+" https://stackoverflow.com/a/9887272/4259341
+hi CursorLineNr term=bold ctermfg=Yellow gui=bold guifg=Yellow
 
 
 """""""""""""""""""""""
@@ -96,6 +125,10 @@ autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
 " https://vim.fandom.com/wiki/Search_and_replace_the_word_under_the_cursor
 nnoremap <Leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
 
+" copy just the file name to clipboard
+nmap <Leader>cs :let @*=expand("%")<CR>
+" copy the filename + path to clipboard
+nmap <Leader>cf :let @*=expand("%:p")<CR>
 
 " tab between buffers
 nmap <Tab>[ :bp<Return>
@@ -120,6 +153,7 @@ nmap <silent> [g <Plug>(coc-diagnostic-prev)
 nmap <silent> ]g <Plug>(coc-diagnostic-next)
 nmap <silent> gi <Plug>(coc-diagnostic-info)
 nmap <silent> gf <Plug>(coc-diagnostic-info)
+nmap <leader>rn <Plug>(coc-rename)
 
 " Use K to show documentation in preview window.
 nnoremap <silent> K :call <SID>show_documentation()<CR>
@@ -135,11 +169,38 @@ endfunction
 
 " Show dotfiles by default
 let NERDTreeShowHidden=1
+let g:NERDTreeWinSize=30
 nmap <silent> <leader>nt :NERDTreeToggle<CR>
 nmap <silent> <leader>nf :NERDTreeFind<CR>
 
 
-nmap <silent> <leader>f :Files<CR>
+
+
+"""""""""""""""""""""""""""""""""""""
+" FZF Settings
+" prevent opening buffers inside of NERD_tree window
+" https://github.com/junegunn/fzf/issues/453
+" https://github.com/junegunn/fzf/issues/453#issuecomment-354634207
+function! FZFOpen(command_str)
+  if (expand('%') =~# 'NERD_tree' && winnr('$') > 1)
+    exe "normal! \<c-w>\<c-w>"
+  endif
+  exe 'normal! ' . a:command_str . "\<cr>"
+endfunction
+
+
+nnoremap <silent> <leader>f :call FZFOpen(':Files')<CR>
+
+" More Vim-specific fzf config available at
+" https://github.com/junegunn/fzf/blob/d4c9db0a273ccd17e7f43026c1297b434df6cbd7/README-VIM.md
+"
+let g:fzf_layout = { 'window': { 'width': 0.7, 'height': 0.5 } }
+let g:fzf_preview_window = []
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+
 
 " Use <esc> during normal mode to clear search highlighting
 nnoremap <esc> :noh<return><esc>
