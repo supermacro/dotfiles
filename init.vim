@@ -17,7 +17,6 @@ Plug 'preservim/nerdtree'
 Plug 'vim-airline/vim-airline'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
-Plug 'mhinz/vim-signify'
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install' }
 Plug 'tpope/vim-surround'
 Plug 'preservim/nerdcommenter'
@@ -45,7 +44,7 @@ call plug#end()
 
 
 " vim-arline settings
-let g:airline#extensions#tabline#enabled = 1
+" let g:airline#extensions#tabline#enabled = 0
 
 " remove git info 
 let g:airline_section_b = ''
@@ -170,6 +169,7 @@ endfunction
 " Show dotfiles by default
 let NERDTreeShowHidden=1
 let g:NERDTreeWinSize=30
+let NERDTreeIgnore = ['\.DS_Store$']
 nmap <silent> <leader>nt :NERDTreeToggle<CR>
 nmap <silent> <leader>nf :NERDTreeFind<CR>
 
@@ -190,6 +190,7 @@ endfunction
 
 
 nnoremap <silent> <leader>f :call FZFOpen(':Files')<CR>
+nnoremap <silent> <leader>b :call FZFOpen(':Buffers')<CR>
 
 " More Vim-specific fzf config available at
 " https://github.com/junegunn/fzf/blob/d4c9db0a273ccd17e7f43026c1297b434df6cbd7/README-VIM.md
