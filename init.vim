@@ -1,6 +1,5 @@
 let g:python3_host_prog = "/usr/local/bin/python3"
 
-
 " Plugins
 
 if empty(glob('~/.config/nvim/autoload/plug.vim'))
@@ -14,7 +13,6 @@ call plug#begin('~/.config/nvim/plugged')
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'airblade/vim-rooter'
 Plug 'preservim/nerdtree'
-Plug 'vim-airline/vim-airline'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install' }
@@ -27,6 +25,8 @@ Plug 'mhartington/oceanic-next'
 Plug 'NieTiger/halcyon-neovim'
 Plug 'morhetz/gruvbox'
 Plug 'lifepillar/vim-solarized8'
+Plug 'embark-theme/vim', { 'as': 'embark' }
+Plug 'ayu-theme/ayu-vim'
 
 
 " Syntax highlighting
@@ -34,26 +34,13 @@ Plug 'pantharshit00/vim-prisma'
 Plug 'ekalinin/Dockerfile.vim'
 Plug 'andys8/vim-elm-syntax'
 Plug 'leafgarland/typescript-vim'
-Plug 'peitalin/vim-jsx-typescript'
+" Plug 'peitalin/vim-jsx-typescript'
+Plug 'maxmellon/vim-jsx-pretty'
 Plug 'cespare/vim-toml'
+Plug 'neovimhaskell/haskell-vim'
 
 call plug#end()
 
-"""""""""""""""""""""""
-" Plugin settings
-
-
-" vim-arline settings
-" let g:airline#extensions#tabline#enabled = 0
-
-" remove git info 
-let g:airline_section_b = ''
-
-" only show the number of lines, and nothing else
-let g:airline_section_z = airline#section#create(['%L', ' ', 'ln'])
-
-" remove separators for empty sections
-let g:airline_skip_empty_sections = 1
 
 
 " General Settings
@@ -67,8 +54,13 @@ syntax enable
 
 " colorscheme solarized8
 " colorscheme gruvbox
-colorscheme OceanicNext
+" colorscheme OceanicNext
 " colorscheme halcyon
+" colorscheme embark
+
+let ayucolor="mirage"
+colorscheme ayu
+
 
 
 augroup WrapLineInMdFile
@@ -77,9 +69,12 @@ augroup WrapLineInMdFile
 augroup END
 
 
+
 set cursorline
 set nowrap
-set number
+
+" Hybrid combination of actual current line number + relative number for other lines
+set number relativenumber
 
 set cmdheight=2
 
@@ -111,6 +106,9 @@ autocmd FileType json setlocal shiftwidth=2 tabstop=2
 autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
 autocmd FileType prisma setlocal shiftwidth=2 tabstop=2
 
+" treat .mjml files as html
+autocmd BufEnter *.mjml :setlocal filetype=html
+
 
 " Highlight Current Line Number
 " https://stackoverflow.com/a/9887272/4259341
@@ -123,6 +121,7 @@ hi CursorLineNr term=bold ctermfg=Yellow gui=bold guifg=Yellow
 " replace all occurrences of word on cursor with whatever you want
 " https://vim.fandom.com/wiki/Search_and_replace_the_word_under_the_cursor
 nnoremap <Leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
+
 
 " copy just the file name to clipboard
 nmap <Leader>cs :let @*=expand("%")<CR>
@@ -195,7 +194,7 @@ nnoremap <silent> <leader>b :call FZFOpen(':Buffers')<CR>
 " More Vim-specific fzf config available at
 " https://github.com/junegunn/fzf/blob/d4c9db0a273ccd17e7f43026c1297b434df6cbd7/README-VIM.md
 "
-let g:fzf_layout = { 'window': { 'width': 0.7, 'height': 0.5 } }
+let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.7 } }
 let g:fzf_preview_window = []
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
