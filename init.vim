@@ -122,6 +122,7 @@ hi CursorLineNr term=bold ctermfg=Yellow gui=bold guifg=Yellow
 " https://vim.fandom.com/wiki/Search_and_replace_the_word_under_the_cursor
 nnoremap <Leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
 
+nmap <CR> :wa<CR>
 
 " copy just the file name to clipboard
 nmap <Leader>cs :let @*=expand("%")<CR>
