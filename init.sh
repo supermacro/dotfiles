@@ -3,7 +3,6 @@
 #### 
 # config 
 # https://stackoverflow.com/a/5947802
-
 info () {
     local GREEN="\033[0;32m"
     local NC="\033[0m"
@@ -72,10 +71,12 @@ else
     warn "found .oh-my-zsh folder - skipping ohmyzsh install"
 fi
 
-# TODO: Overwrite .zshrc with your own 
+info "symlinking custom .zshrc to ~"
+# remove default .zshrc 
+rm ../.zshrc 
+# create symlink
+ln -s ~/dotfiles/.zshrc ~/.zshrc
 
-warn "hack exit"
-exit 0
 
 # 1 - install homebrew
 
@@ -97,7 +98,7 @@ fi
 
 
 # 2 - install neovim
-if ! command -v neovim &> /dev/null
+if ! command -v nvim &> /dev/null
 then
     info "neovim not installed, installing neovim now"
     brew install neovim
