@@ -145,6 +145,23 @@ else
 fi
 
 
+if ! command -v jq &> /dev/null
+then
+    info "installing jq"
+    brew install jq
+else 
+    warn "jq already installed, skipping jq install"
+fi
+
+if ! command -v fzf &> /dev/null
+then
+    info "installing fzf "
+    brew install fzf
+else 
+    warn "fzf already installed, skipping jq install"
+fi
+
+
 if ! command -v kitty &> /dev/null
 then
     info "kitty not installed, installing kitty now"
