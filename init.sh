@@ -162,6 +162,16 @@ else
     warn "fzf already installed, skipping jq install"
 fi
 
+if ! command -v fdfind &> /dev/null
+then
+    info "installing fd (find alternative)"
+    sudo apt install fd-find
+    mkdir ~/.local/bin
+    ln -s $(which fdfind) ~/.local/bin/fd
+else
+    warn "command 'fd' found, skipping fd installation"
+fi
+
 
 if ! command -v diff-so-fancy &> /dev/null
 then
