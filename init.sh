@@ -230,6 +230,11 @@ then
     info "installing docker engine"
     sudo apt update
     sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+    # ensure that various docker commands have permission to run
+    # https://linuxhandbook.com/docker-permission-denied/
+    sudo groupadd docker &> /dev/null || echo "created docker group"
+    sudo usermod -aG docker $USER
 else
     info "docker already installed, skipping docker installation"
 fi
