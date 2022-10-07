@@ -25,9 +25,21 @@ sudo add-apt-repository ppa:git-core/ppa -y
 sudo apt update
 sudo apt upgrade -y
 
-# install xclip
-info "installing xclip"
-sudo apt install xclip
+if ! command -v xclip &> /dev/null
+then
+    info "installing xclip"
+    sudo apt install xclip
+else
+    warn "skipping xclip install"
+fi
+
+if ! command -v neofetch &> /dev/null
+then
+    info "installing neofetch"
+    sudo apt install neofetch
+else
+    warn "skipping neofetch install"
+fi
 
 # get my email
 info "please enter your email, this will be associated to your git config"
@@ -107,7 +119,6 @@ then
     nvm install --lts
 fi
 
-
 if ! command -v nvim &> /dev/null
 then
     info "neovim not installed, installing neovim now"
@@ -142,4 +153,19 @@ then
     ln -s ~/dotfiles/kitty.conf ~/.config/kitty/kitty.conf
 else
     warn "kitty already installed, skipping install"
+fi
+
+if ! command -v gcloud &> /dev/null
+then
+    info "beginning install of 'gcloud' cli"
+
+    # Gcloud CLI Stuff
+    # https://cloud.google.com/sdk/docs/install#deb
+    sudo apt install apt-transport-https ca-certificates gnupg
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+    sudo apt update && sudo apt install google-cloud-cli
+    gcloud init
+else
+    warn "'gcloud' already installed, skipping gcloud cli install"
 fi
