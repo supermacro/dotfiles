@@ -49,19 +49,9 @@ git config --global user.name "Giorgio Delgado"
 git config --global user.email "$MY_EMAIL"
 
 
-# Before restoring:
-#   - get code in staging
-
-# want to install:
-#   - neovim
-#       - pull my lua files from github
-#   - kitty
-#   - zshell
-#   - gcloud cli
-#   - google cloud proxy
-
-# 0 - install zsh + ohmyzsh
-# ensure that zsh is the default shell
+#   TODO:
+#     add 
+#       - google cloud proxy
 
 if [[ "$SHELL" == *zsh ]] 
 then
