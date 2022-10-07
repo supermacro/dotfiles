@@ -1,5 +1,6 @@
 export DENO_INSTALL="/home/giorgiodelgado/.deno"
-export PATH=$HOME/bin:/usr/local/bin:$DENO_INSTALL/bin:$PATH
+export KITTY_PATH="/home/giorgiodelgado/.local/kitty.app"
+export PATH=$HOME/bin:/usr/local/bin:$DENO_INSTALL/bin:$KITTY_PATH/bin:$PATH
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"

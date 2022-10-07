@@ -25,6 +25,10 @@ sudo add-apt-repository ppa:git-core/ppa -y
 sudo apt update
 sudo apt upgrade -y
 
+# install xclip
+info "installing xclip"
+sudo apt install xclip
+
 # get my email
 info "please enter your email, this will be associated to your git config"
 read MY_EMAIL
@@ -78,8 +82,6 @@ rm ../.zshrc
 ln -s ~/dotfiles/.zshrc ~/.zshrc
 
 
-# 1 - install homebrew
-
 if ! command -v brew &> /dev/null
 then
     info "homebrew not installed, installing brew now"
@@ -91,28 +93,53 @@ then
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
     # Install Homebrew's dependencies if you have sudo access:
-    sudo apt-get install build-essential
+    sudo apt install build-essential
 else
     warn "homebrew already installed, skipping install"
 fi
 
+if ! command -v node &> /dev/null
+then
+    info "installing nvm (Node Version Manager)"
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+    # source .zshrc so that `nvm` is recognized in the current session
+    source .zshrc
+    nvm install --lts
+fi
 
-# 2 - install neovim
+
 if ! command -v nvim &> /dev/null
 then
     info "neovim not installed, installing neovim now"
     brew install neovim
-    # TODO: need to move into PATH
+
+    info "symlinking nvim config to ~/.config/nvim"
+    ln -s ~/dotfiles/nvim ~/.config/nvim
+
+    info "installing packer to manage neovim plugins / deps"
+    git clone --depth 1 \
+        https://github.com/wbthomason/packer.nvim \
+        ~/.local/share/nvim/site/pack/packer/start/packer.nvim
+
+    info "preparing to add custom NERDFont"
+    # mkdir -p ~/.local/share/fonts
+    git clone --filter=blob:none --sparse git@github.com:ryanoasis/nerd-fonts
+    cd nerd-fonts
+    git sparse-checkout add patched-fonts/JetBrainsMono
+    ./install.sh JetBrainsMono
+    info "installed JetBrainsMono"
+    cd ..
 else
     warn "neovim already installed, skipping install"
 fi
 
 
-# 3 - install kitty 
 if ! command -v kitty &> /dev/null
 then
     info "kitty not installed, installing kitty now"
     curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
+    info "symlinking custom kitty.conf"
+    ln -s ~/dotfiles/kitty.conf ~/.config/kitty/kitty.conf
 else
     warn "kitty already installed, skipping install"
 fi
