@@ -196,6 +196,21 @@ then
     curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
     info "symlinking custom kitty.conf"
     ln -s ~/dotfiles/kitty.conf ~/.config/kitty/kitty.conf
+
+    # PopOS-specific: Ensure that Kitty can be accessed via the launcher
+    # https://www.arm64.ca/post/creating-launch-plugins-for-pop-os-updated/
+    mkdir -p $HOME/.local/share/pop-launcher/scripts
+    printf '%s\n' \
+        '#!/bin/sh' \
+        '#' \
+        '# name: Kitty' \
+        "# icon: $HOME/.local/kitty.app/share/icons/hicolor/256x256/apps/kitty.png" \
+        '# description: Launch Kitty' \
+        '# keywords: kitty terminal' \
+        '' \
+        "$HOME/.local/kitty.app/bin/kitty" > $HOME/.local/share/pop-launcher/scripts/kitty.sh
+
+    chmod +x $HOME/.local/share/pop-launcher/scripts/kitty.sh
 else
     warn "kitty already installed, skipping install"
 fi
