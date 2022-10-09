@@ -26,6 +26,10 @@ sudo add-apt-repository ppa:git-core/ppa -y
 sudo apt update
 sudo apt upgrade -y
 
+
+# bunch of nice media codecs 
+apt install ubuntu-restricted-extras
+
 if ! command -v xclip &> /dev/null
 then
     info "installing xclip"
@@ -142,6 +146,14 @@ then
     brew install jq
 else 
     warn "jq already installed, skipping jq install"
+fi
+
+if ! command -v rg &> /dev/null
+then 
+    info "installing ripgrep"
+    brew install ripgrep
+else
+    warn "rg binnary found - skipping ripgrep installation"
 fi
 
 if ! command -v fzf &> /dev/null
