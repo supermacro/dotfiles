@@ -156,6 +156,14 @@ else
     warn "rg binnary found - skipping ripgrep installation"
 fi
 
+if ! command -v gh &> /dev/null
+then 
+    info "installing github cli"
+    brew install gh
+else
+    warn "gh binnary found - skipping github cli"
+fi
+
 if ! command -v fzf &> /dev/null
 then
     info "installing fzf "
