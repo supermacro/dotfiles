@@ -22,6 +22,8 @@ keymap('n', '<leader>h', ':echo "hello!"<CR>', {desc = 'Say hello'})
 -- Some basics
 keymap('n', '<CR>', ':wa<CR>', opts)
 keymap('n', '<esc>', ':noh<CR>', opts)
+-- copy path to file
+keymap('n', 'cp', ':let @+ = expand("%")<CR>', opts)
 
 -- NvimTree Aliases
 keymap('n', '<leader>e', ':NvimTreeToggle<CR>', opts)
