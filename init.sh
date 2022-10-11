@@ -30,6 +30,15 @@ sudo apt upgrade -y
 # bunch of nice media codecs 
 apt install ubuntu-restricted-extras
 
+
+# https://stackoverflow.com/questions/53930305/nodemon-error-system-limit-for-number-of-file-watchers-reached
+FILE_WATCH_COUNT=$(find /proc/*/fd -user "$USER" -lname anon_inode:inotify -printf '%hinfo/%f\n' 2>/dev/null | xargs cat | grep -c '^inotify')
+if (( $FILE_WATCH_COUNT < 80000 ));
+then
+    info "increasing file watch count"
+    echo fs.inotify.max_user_watches=80000 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+fi
+
 if ! command -v xclip &> /dev/null
 then
     info "installing xclip"
@@ -51,11 +60,8 @@ info "please enter your email, this will be associated to your git config"
 read MY_EMAIL
 git config --global user.name "Giorgio Delgado"
 git config --global user.email "$MY_EMAIL"
+git config --global core.editor "nvim"
 
-
-#   TODO:
-#     add 
-#       - google cloud proxy
 
 if [[ "$SHELL" == *zsh ]] 
 then
