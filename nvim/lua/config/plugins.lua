@@ -45,10 +45,17 @@ return require('packer').startup(function()
     },                                                         
   }
 
-  use({
+  use {
+    'jose-elias-alvarez/null-ls.nvim',
+    requires = {
+      {'nvim-lua/plenary.nvim'},
+    },
+  }
+
+  use {
     "iamcco/markdown-preview.nvim",
     run = function() vim.fn["mkdp#util#install"]() end,
-  })
+  }
 
   -- LSP Stuff
   use 'williamboman/mason.nvim'
