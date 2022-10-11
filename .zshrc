@@ -147,6 +147,9 @@ function goto () {
   cd $PROJECT_DIR
 }
 
+# https://stackoverflow.com/questions/1527049/how-can-i-join-elements-of-an-array-in-bash
+function join_by { local d=$1; shift; local f=$1; shift; printf %s "$f" "${@/#/$d}"; }
+
 function dbproxy () {
 	local ENVIRONMENTS=("staging" "production") 
 	local FZF_STRING=$(join_by "\n" "${ENVIRONMENTS[@]}") 

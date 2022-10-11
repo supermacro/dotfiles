@@ -284,3 +284,13 @@ then
 else
     warn "'gcloud' already installed, skipping gcloud cli install"
 fi
+
+if ! command -v ~/cloud_sql_proxy &> /dev/null
+then
+    info "beginning install of cloud sql proxy"
+
+    wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O ~/cloud_sql_proxy
+    chmod +x ~/cloud_sql_proxy
+else
+    warn "cloud sql proxy already installed at $HOME - skipping cloud sql proxy install"
+fi
