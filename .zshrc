@@ -157,7 +157,7 @@ function dbproxy () {
 	if [ "$SELECTED_ENV" = "staging" ]
 	then
 		echo "> Running staging proxy"
-		~/cloud_sql_proxy -instances=caribou-staging-303716:us-east1:caribou-staging=tcp:3306
+		~/cloud_sql_proxy -instances=caribou-staging-303716:us-east1:caribou-staging=tcp:3309
 	elif [ "$SELECTED_ENV" = "production" ]
 	then
 		echo "> Running prod proxy"

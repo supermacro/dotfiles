@@ -9,4 +9,6 @@ require('config.telescope')
 require('config.autocommands')
 require('config.smooth-cursor')
 require('config.treesitter')
-require('config.null-ls')
+
+-- hypothesis: null-ls is destroying my RAM
+-- require('config.null-ls')

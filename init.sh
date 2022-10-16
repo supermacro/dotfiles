@@ -188,6 +188,14 @@ else
     warn "command 'fd' found, skipping fd installation"
 fi
 
+if ! command -v deno &> /dev/null
+then
+    info "installing deno"
+    curl -fsSL https://deno.land/install.sh | sh
+else
+    warn "command 'deno' found, skipping deno installation"
+fi
+
 
 if ! command -v diff-so-fancy &> /dev/null
 then
@@ -261,6 +269,9 @@ then
     info "installing docker engine"
     sudo apt update
     sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    sudo curl -L "https://github.com/docker/compose/releases/download/v2.11.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+
 
     # ensure that various docker commands have permission to run
     # https://linuxhandbook.com/docker-permission-denied/
