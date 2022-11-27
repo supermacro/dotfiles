@@ -1,5 +1,6 @@
 local o = vim.opt
 local g = vim.g
+local api = vim.api
 
 o.debug = throw
 o.cursorline = true
@@ -10,9 +11,6 @@ o.termguicolors = true
 o.cmdheight = 2
 o.swapfile = false
 o.ignorecase = true -- ignore case in search patterns
-
-o.foldmethod="expr"
-o.foldexpr="nvim_treesitter#foldexpr()"
 
 -- tab options
 o.expandtab = true
@@ -35,22 +33,25 @@ vim.cmd [[
 
     " treat .mjml files as html
     autocmd BufEnter *.mjml :setlocal filetype=html
-]]
 
+    " open folds initially
+    autocmd BufReadPost,FileReadPost * normal zR
+]]
 
 
 ---------------------------------------------------
 -- tree sitter lesgooo
-vim.opt.foldmethod     = 'expr'
-vim.opt.foldexpr       = 'nvim_treesitter#foldexpr()'
+o.foldmethod="expr"
+o.foldexpr="nvim_treesitter#foldexpr()"
+
 --
 ---WORKAROUND
 -- https://github.com/nvim-treesitter/nvim-treesitter/wiki/Installation
-vim.api.nvim_create_autocmd({'BufEnter','BufAdd','BufNew','BufNewFile','BufWinEnter'}, {
+api.nvim_create_autocmd({'BufEnter','BufAdd','BufNew','BufNewFile','BufWinEnter'}, {
   group = vim.api.nvim_create_augroup('TS_FOLD_WORKAROUND', {}),
   callback = function()
-    vim.opt.foldmethod     = 'expr'
-    vim.opt.foldexpr       = 'nvim_treesitter#foldexpr()'
+    vim.opt.foldmethod= 'expr'
+    vim.opt.foldexpr= 'nvim_treesitter#foldexpr()'
   end
 })
 ---ENDWORKAROUND

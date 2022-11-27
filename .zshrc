@@ -123,7 +123,6 @@ function notes() {
   kitty @ launch --title "notes" --type os-window --cwd ~/Desktop/notes nvim -c "NvimTreeToggle"
 }
 
-
 function masterPass() {
   pbcopy < ~/Desktop/notes/pass.txt
 }

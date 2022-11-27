@@ -120,6 +120,12 @@ then
     nvm install --lts
 fi
 
+if ! command -v prettierd &> /dev/null
+then
+    info "installing prettier daemon"
+    npm install -g @fsouza/prettierd
+fi
+
 if ! command -v nvim &> /dev/null
 then
     info "neovim not installed, installing neovim now"
@@ -248,6 +254,14 @@ then
 else
     warn "kitty already installed, skipping install"
 fi
+
+
+# if ! command -v mysqlsh &> /dev/null
+# then
+#    info "mysqlsh not installed, installing mysqlsh now"
+#
+# else
+# fi
 
 if ! command -v docker &> /dev/null
 then

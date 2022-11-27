@@ -16,9 +16,24 @@ return require('packer').startup(function()
     end
   }
 
+  --[[
+  use {
+    "johmsalas/text-case.nvim",
+    config = function()
+      require('textcase').setup()
+    end
+  }
+  --]]
+
+  use {
+    'nvim-lualine/lualine.nvim',
+    requires = { 'kyazdani42/nvim-web-devicons', opt = false }
+  }
+
   -- 🌳 sitter lesgo (charles leclerc voice)
   use {
     'nvim-treesitter/nvim-treesitter',
+    commit = 'dfcd371058bcc972f2a60d376280e4347c5a7ace',
     run = function() require('nvim-treesitter.install').update({ with_sync = true }) end,
   }
 
@@ -33,6 +48,7 @@ return require('packer').startup(function()
 
   -- Themes & Syntax Stuff
   use 'ayu-theme/ayu-vim'
+  use 'folke/tokyonight.nvim'
 
   -- Fuzzy Finding Things
   use {                                                        
@@ -51,6 +67,8 @@ return require('packer').startup(function()
       {'nvim-lua/plenary.nvim'},
     },
   }
+
+  use { 'mhartington/formatter.nvim' }
 
   use {
     "iamcco/markdown-preview.nvim",
