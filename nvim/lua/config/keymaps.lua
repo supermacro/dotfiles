@@ -36,7 +36,7 @@ keymap('n', '<space>p', ':cp<CR>', opts)
 
 -- Telescope Aliases
 keymap('n', '<leader>ff', ':Telescop find_files<CR>', opts)
-keymap('n', '<leader>fg', ':Telescope live_grep<CR>', opts)
+keymap('n', '<leader>fg', ':Telescope live_grep_args<CR>', opts)
 keymap('n', '<leader>fb', ':Telescope buffers<CR>', opts)
 keymap('n', '<leader>fh', ':Telescope help_tags<CR>', opts)
 
@@ -49,9 +49,6 @@ keymap('n', '<leader>y', ":let @+=expand('%:p')<CR>", opts) -- widen window by 3
 -- https://vim.fandom.com/wiki/Move_cursor_by_display_lines_when_wrapping
 keymap('n', 'j', 'gj', opts)
 keymap('n', 'k', 'gk', opts)
-
-
-
 
 -- x11 bruh
 -- https://vim.fandom.com/wiki/GNU/Linux_clipboard_copy/paste_with_xclip

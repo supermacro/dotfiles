@@ -23,4 +23,7 @@ telescope.setup({
       vertical = { width = 0.9 }
     },
   },
+  extensions = {
+    live_grep_args = pickers_config,
+  },
 })

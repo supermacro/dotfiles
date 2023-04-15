@@ -1,6 +1,7 @@
 export DENO_INSTALL="/home/giorgiodelgado/.deno"
 export KITTY_PATH="/home/giorgiodelgado/.local/kitty.app"
-export PATH=/usr/bin:$HOME/bin:/usr/local/bin:$HOME/.local/bin:$DENO_INSTALL/bin:$KITTY_PATH/bin:$PATH
+export PATH=/opt/homebrew/bin:/usr/bin:$HOME/bin:/usr/local/bin:$HOME/.local/bin:$DENO_INSTALL/bin:$KITTY_PATH/bin:$PATH
+
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -85,6 +86,9 @@ plugins=(git colorize)
 
 source $ZSH/oh-my-zsh.sh
 
+source ~/.zplug/init.zsh
+
+
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
@@ -113,11 +117,16 @@ source $ZSH/oh-my-zsh.sh
 alias vi=nvim
 alias neovim=nvim
 alias c=/usr/bin/clear
-alias pbcopy='xclip -selection clipboard'
-alias pbpaste='xclip -selection clipboard -o'
+
+# These are linux-only
+# https://duckduckgo.com/?q=shell+check+operating+system&t=newext&atb=v355-2&ia=web
+# alias pbcopy='xclip -selection clipboard'
+# alias pbpaste='xclip -selection clipboard -o'
+
 alias gs="git status"
 alias sdiff="git diff | git-split-diffs --color | less -RFX"
 alias gch="git branch | fzf | xargs git checkout"
+alias python=python3
 
 function notes() {
   kitty @ launch --title "notes" --type os-window --cwd ~/Desktop/notes nvim -c "NvimTreeToggle"
@@ -140,10 +149,13 @@ function x() {
 }
 
 function goto () {
-  # local ABSOLUTE_PATH="/Users/giorgiodelgado/code" 
+  local ABSOLUTE_PATH="/Users/giorgiodelgado/code" 
   local PROJECT_DIR=$(find ~/code \( -name .git -o -name node_modules -o -name elm-stuff -o -name .stack-work \) -prune -o -type d -print | awk '{ gsub("/Users/giorgiodelgado/code/", ""); print $0 }' | fzf) 
-  # cd "$ABSOLUTE_PATH/$PROJECT_DIR"
-  cd $PROJECT_DIR
+
+  echo "Going to $PROJECT_DIR"
+
+  cd "$ABSOLUTE_PATH/$PROJECT_DIR"
+  # cd $PROJECT_DIR
 }
 
 # https://stackoverflow.com/questions/1527049/how-can-i-join-elements-of-an-array-in-bash
@@ -210,13 +222,24 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+export PATH="/Users/giorgiodelgado/Library/Caches/fnm_multishells/5049_1680890347632/bin":$PATH
+export FNM_VERSION_FILE_STRATEGY="local"
+export FNM_ARCH="arm64"
+export FNM_MULTISHELL_PATH="/Users/giorgiodelgado/Library/Caches/fnm_multishells/5049_1680890347632"
+export FNM_DIR="/Users/giorgiodelgado/Library/Application Support/fnm"
+export FNM_LOGLEVEL="info"
+export FNM_NODE_DIST_MIRROR="https://nodejs.org/dist"
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '/home/giorgiodelgado/google-cloud-sdk/path.zsh.inc' ]; then . '/home/giorgiodelgado/google-cloud-sdk/path.zsh.inc'; fi
+if [ -f '/Users/giorgiodelgado/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/giorgiodelgado/google-cloud-sdk/path.zsh.inc'; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '/home/giorgiodelgado/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/giorgiodelgado/google-cloud-sdk/completion.zsh.inc'; fi
+if [ -f '/Users/giorgiodelgado/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/giorgiodelgado/google-cloud-sdk/completion.zsh.inc'; fi
+
+# pnpm
+export PNPM_HOME="/Users/giorgiodelgado/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

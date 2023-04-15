@@ -1,7 +1,7 @@
 require('lualine').setup({
   options = {
     -- theme = 'OceanicNext',
-    theme = 'tokyonight',
+    theme = 'ayu_light',
     disabled_filetypes = { 'packer', 'NvimTree' },
   },
   sections = {

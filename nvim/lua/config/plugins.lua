@@ -7,6 +7,8 @@ return require('packer').startup(function()
   -- Packer can manage itself
   use 'wbthomason/packer.nvim'
 
+  use {'nyoom-engineering/oxocarbon.nvim'}
+
   -- better cursor
   use {
     'gen740/SmoothCursor.nvim',
@@ -14,6 +16,15 @@ return require('packer').startup(function()
     config = function()
       require('smoothcursor').setup()
     end
+  }
+
+  use {
+    "zbirenbaum/copilot.lua",
+    cmd = "Copilot",
+    event = "InsertEnter",
+    config = function()
+      require("copilot").setup({})
+    end,
   }
 
   --[[
@@ -49,6 +60,7 @@ return require('packer').startup(function()
   -- Themes & Syntax Stuff
   use 'ayu-theme/ayu-vim'
   use 'folke/tokyonight.nvim'
+  use 'cocopon/iceberg.vim'
 
   -- Fuzzy Finding Things
   use {                                                        
@@ -58,8 +70,13 @@ return require('packer').startup(function()
       {'nvim-lua/plenary.nvim'},                               
       {'nvim-telescope/telescope-fzf-native.nvim', run="make"},
       {'nvim-telescope/telescope-symbols.nvim'},               
+      {'nvim-telescope/telescope-live-grep-args.nvim'},
     },                                                         
+    config = function()
+      require("telescope").load_extension("live_grep_args")
+    end
   }
+
 
   use {
     'jose-elias-alvarez/null-ls.nvim',
