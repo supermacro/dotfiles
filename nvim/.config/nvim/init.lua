@@ -1,0 +1,8 @@
+require('plugins')
+require('configs')
+require('reload')
+require('keymaps')
+require('autocmds')
+require('statusline')
+require('lsp')
+require('theme')
