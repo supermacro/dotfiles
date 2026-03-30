@@ -47,7 +47,7 @@ ensure_homebrew() {
     fi
 
     info "Installing Homebrew."
-    NONINTERACTIVE=1 /bin/bash -c \
+    /bin/bash -c \
         "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
     if [[ -x /opt/homebrew/bin/brew ]]; then
@@ -240,8 +240,9 @@ main() {
     brew_install_formula "tmux"
     brew_install_formula "fzf"
     brew_install_formula "tree"
+    brew_install_formula "rg"
+    
 
-    brew tap homebrew/cask-fonts
     brew_install_cask "kitty"
     brew_install_cask "font-jetbrains-mono-nerd-font"
 

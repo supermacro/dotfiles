@@ -150,11 +150,14 @@ function goto () {
 
 eval "$(fnm env --use-on-cd --shell zsh)"
 
-
 # pnpm
 export PNPM_HOME="$HOME/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
+[[ -d "$PNPM_HOME" ]] && path=("$PNPM_HOME" $path)
 # pnpm end
+
+# bob / nvim
+[[ -d "$HOME/.local/share/bob/nvim-bin" ]] && path=("$HOME/.local/share/bob/nvim-bin" $path)
+
+# ensure no duplicates
+typeset -U path PATH
+
