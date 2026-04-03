@@ -20,3 +20,6 @@
 [push]
     autoSetupRemote = true
     default = current
+
+[includeIf "gitdir:/Users/gio/dev/coplane/"]
+    path = ~/.gitconfig-coplane

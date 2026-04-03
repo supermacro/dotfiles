@@ -28,6 +28,11 @@ opt.undofile = true -- Enable persistent undo
 opt.completeopt = { "menuone", "popup", "noinsert" } -- Options for completion menu
 opt.winborder = "rounded" -- Use rounded borders for windows
 opt.hlsearch = true -- Disable highlighting of search results
+opt.foldmethod = "expr" -- Use an expression to compute folds
+opt.foldexpr = "v:lua.vim.treesitter.foldexpr()" -- Language-aware folds from Treesitter
+opt.foldenable = true -- Enable folding
+opt.foldlevel = 99 -- Keep folds open by default
+opt.foldlevelstart = 99 -- Start with folds open when a buffer is loaded
 
 
 vim.cmd.filetype("plugin indent on") -- Enable filetype detection, plugins, and indentation

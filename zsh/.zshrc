@@ -125,13 +125,26 @@ alias zshrc="vi ~/.zshrc"
 
 alias gs="git status"
 
-run_coplane () {
-  tmux new-session -d -s coplane
-  tmux new-window -t coplane:1 -n frontend
-  tmux new-window -t coplane:2 -n backend
-  tmux send-keys -t coplane:frontend 'cd ~/dev/coplane/coplane/frontend && pnpm run dev' Enter
-  tmux send-keys -t coplane:backend 'cd ~/dev/coplane/coplane/backend && uv run uvicorn main:app --reload --port 8080' Enter
+function vimm() {
+  local file
+  file="$(fd -I -t f . | fzf)" || return
+  [[ -n "$file" ]] && vi "$file"
 }
+
+function run_coplane () {
+  if tmux has-session -t coplane 2>/dev/null; then
+    echo "there's already a session called coplane"
+    exit 1
+  fi
+
+  tmux new-session -d -s coplane -n frontend -c ~/dev/coplane/coplane/frontend
+
+  tmux new-window -t coplane:1 -n backend -c ~/dev/coplane/coplane/backend
+
+  tmux send-keys -t coplane:frontend 'pnpm run dev' Enter
+  tmux send-keys -t coplane:backend 'uv run uvicorn main:app --reload --port 8080' Enter
+}
+
 
 function goto () {
   local project_root="$HOME/dev"

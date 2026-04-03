@@ -241,7 +241,11 @@ main() {
     brew_install_formula "fzf"
     brew_install_formula "tree"
     brew_install_formula "rg"
-    
+    brew_install_formula "fd"
+
+    # mysql deps
+    brew_install_formula "pkgconf"
+    brew_install_formula "mysql-client"
 
     brew_install_cask "kitty"
     brew_install_cask "font-jetbrains-mono-nerd-font"
