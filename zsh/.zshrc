@@ -79,7 +79,7 @@ ZSH_THEME="robbyrussell"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=(git git-prompt git-auto-fetch)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -120,18 +120,35 @@ fi
 
 alias vi="nvim"
 alias x="exit"
-alias nvimconfig="cd ~/.config/nvim && vi"
 alias zshrc="vi ~/.zshrc"
 
 alias gs="git status"
 
-function vimm() {
+nvimconfig() {
+    local edit
+
+    zparseopts -D -E e=edit --edit=edit
+
+    cd ~/.config/nvim || return
+
+    if (( ${#edit} )); then
+        vi
+    fi
+}
+
+
+vimm() {
   local file
-  file="$(fd -I -t f . | fzf)" || return
+  local -a fd_excludes=(
+    --exclude __pycache__
+    --exclude __marimo__
+  )
+
+  file="$(fd -I -t f . ${fd_excludes[@]} | fzf)" || return
   [[ -n "$file" ]] && vi "$file"
 }
 
-function run_coplane () {
+run_coplane () {
   if tmux has-session -t coplane 2>/dev/null; then
     echo "there's already a session called coplane"
     exit 1
@@ -146,18 +163,27 @@ function run_coplane () {
 }
 
 
-function goto () {
+goto () {
   local project_root="$HOME/dev"
   local project_dir
+  local -a fd_excludes=(
+    --exclude .git
+    --exclude node_modules
+    --exclude .venv
+    --exclude __pycache__
+  )
+
   project_dir="$(
-    find "$project_root" \( -name .git -o -name node_modules \) -prune -o -type d -print |
-      sed "s|^$project_root||" |
+    cd "$project_root" || return
+    fd -I -t d . ${fd_excludes[@]} |
+      rg -v '(^|/)\.venv(/|$)' |
+      awk -F/ 'NF <= 4' |
       fzf
-  )"
+  )" || return
 
   echo "Going to $project_dir"
 
-  cd "$project_root$project_dir"
+  cd "$project_root/$project_dir"
 }
 
 
@@ -174,3 +200,6 @@ export PNPM_HOME="$HOME/Library/pnpm"
 # ensure no duplicates
 typeset -U path PATH
 
+. "$HOME/.atuin/bin/env"
+
+eval "$(atuin init zsh)"

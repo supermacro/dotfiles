@@ -6,8 +6,8 @@ vim.lsp.enable({
   "texlab",
   "ts_ls",
   "ty",
+  -- "pyrefly",
   "ruff",
 })
 
 vim.diagnostic.config({ virtual_text = true })
-

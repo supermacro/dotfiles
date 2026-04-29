@@ -15,11 +15,19 @@ autocmd('TextYankPost', {
 local text_wrapping_group = vim.api.nvim_create_augroup("WrapTextBuffers", { clear = true })
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "markdown", "text" },
-  callback = function()
+  callback = function(args)
     -- Window-local options (correct scope)
     vim.wo.wrap = true
     vim.wo.linebreak = true
     vim.wo.showbreak = "↪ "
+
+    if vim.bo[args.buf].filetype == "markdown" then
+      vim.wo.conceallevel = 2
+      vim.wo.concealcursor = "nc"
+      vim.wo.colorcolumn = ""
+      vim.wo.list = false
+      vim.wo.spell = true
+    end
 
     -- Default breakat is already reasonable
     -- Only customize if you have a specific preference
@@ -79,5 +87,3 @@ autocmd('LspAttach', {
         vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, opts)
     end,
 })
-
-

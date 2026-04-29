@@ -1,7 +1,9 @@
 -- ~/.config/nvim-new/lua/plugins.lua
 vim.pack.add({
+  { src = "https://github.com/folke/snacks.nvim" },
   { src = "https://github.com/lewis6991/gitsigns.nvim" },
   { src = "https://github.com/mason-org/mason.nvim" },
+  { src = "https://github.com/nvim-treesitter/nvim-treesitter-context" },
   { src = "https://github.com/saghen/blink.cmp", version = vim.version.range("^1") },
   { src = "https://github.com/nvim-tree/nvim-tree.lua" },
   { src = "https://github.com/nvim-tree/nvim-web-devicons" },
@@ -35,6 +37,7 @@ local nvim_tree_exclude = {
   "/%.env%.[^/]+$",
   "/%.data$",
   "/%.db$",
+  "/%.runtime$",
 }
 
 for _, dir in ipairs({ "sandbox", "node_env" }) do
@@ -42,6 +45,27 @@ for _, dir in ipairs({ "sandbox", "node_env" }) do
 end
 
 local treesitter_group = vim.api.nvim_create_augroup("TreesitterStart", { clear = true })
+local function_only_context_query = [[
+(function_declaration) @context
+(generator_function_declaration) @context
+(method_definition) @context
+(
+  (lexical_declaration
+    (variable_declarator
+      value: [
+        (arrow_function)
+        (function_expression)
+      ])) @context
+)
+(
+  (variable_declaration
+    (variable_declarator
+      value: [
+        (arrow_function)
+        (function_expression)
+      ])) @context
+)
+]]
 
 require("nvim-tree").setup({
     renderer = {
@@ -59,6 +83,43 @@ require("nvim-tree").setup({
     },
 })
 
+require("snacks").setup({
+    input = { enabled = true },
+    picker = {
+        enabled = true,
+        ui_select = true,
+        sources = {
+            select = {
+                layout = { preset = "select" },
+                kinds = {
+                    codeaction = {
+                        focus = "list",
+                        hidden = { "input", "preview" },
+                        on_show = function(picker)
+                            vim.schedule(function()
+                                if picker and not picker.closed and picker.list then
+                                    picker.list:view(1, 1)
+                                end
+                            end)
+                        end,
+                        layout = {
+                            preset = "select",
+                            layout = {
+                                relative = "cursor",
+                                anchor = "NW",
+                                row = 1,
+                                col = 0,
+                                height = 6,
+                                min_width = 60,
+                                max_width = 100,
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+})
 require('gitsigns').setup()
 require('mason').setup({})
 require('telescope').setup({
@@ -69,6 +130,11 @@ require('telescope').setup({
         find_files = {
             find_command = { "rg", "--files", "--color", "never", "--sort", "path" },
             entry_prefix = "   ",
+            previewer = false,
+            sorting_strategy = "ascending",
+            layout_config = {
+                prompt_position = "top",
+            },
         },
     }
 })
@@ -78,6 +144,8 @@ require("nvim-treesitter").install({
   "vim",
   "vimdoc",
   "query",
+  "markdown",
+  "markdown_inline",
   "javascript",
   "typescript",
   "tsx",
@@ -92,12 +160,39 @@ vim.api.nvim_create_autocmd("FileType", {
     "vim",
     "bash",
     "json",
+    "markdown",
     "javascript",
+    "javascriptreact",
     "typescript",
     "typescriptreact",
   },
   callback = function()
     vim.treesitter.start()
+  end,
+})
+
+vim.treesitter.query.set("javascript", "context", function_only_context_query)
+vim.treesitter.query.set("typescript", "context", function_only_context_query)
+vim.treesitter.query.set("tsx", "context", function_only_context_query)
+vim.treesitter.query.set("python", "context", [[
+(
+  (function_definition
+    body: (_) @context.end) @context
+)
+]])
+
+require("treesitter-context").setup({
+  max_lines = 1,
+  multiline_threshold = 1,
+  line_numbers = false,
+  trim_scope = "outer",
+  on_attach = function(buf)
+    local filetype = vim.bo[buf].filetype
+    return filetype == "javascript"
+      or filetype == "javascriptreact"
+      or filetype == "typescript"
+      or filetype == "typescriptreact"
+      or filetype == "python"
   end,
 })
 
@@ -138,4 +233,3 @@ require('blink.cmp').setup({
 
     sources = { default = { "lsp" } }
 })
-
