@@ -122,20 +122,19 @@ require("snacks").setup({
 })
 require('gitsigns').setup()
 require('mason').setup({})
+local telescope_helpers = require("telescope_helpers")
+
 require('telescope').setup({
     pickers = {
-        colorscheme = {
+        colorscheme = telescope_helpers.with_top_prompt({
             enable_preview = true,
-        },
-        find_files = {
+        }),
+        find_files = telescope_helpers.with_top_prompt({
             find_command = { "rg", "--files", "--color", "never", "--sort", "path" },
             entry_prefix = "   ",
             previewer = false,
-            sorting_strategy = "ascending",
-            layout_config = {
-                prompt_position = "top",
-            },
-        },
+        }),
+        live_grep = telescope_helpers.with_top_prompt(),
     }
 })
 require("nvim-treesitter").install({

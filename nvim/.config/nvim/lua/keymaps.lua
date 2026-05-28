@@ -66,11 +66,12 @@ local action_state = require("telescope.actions.state")
 local conf = require("telescope.config").values
 local finders = require("telescope.finders")
 local pickers = require("telescope.pickers")
+local telescope_helpers = require("telescope_helpers")
 
 local function live_grep(opts)
     opts = opts or {}
 
-    builtin.live_grep({
+    builtin.live_grep(telescope_helpers.with_top_prompt({
         cwd = opts.cwd,
         additional_args = function ()
             return { "--fixed-strings" }
@@ -80,7 +81,7 @@ local function live_grep(opts)
             height = 0.99,
             preview_width = 0.4,
         },
-    })
+    }))
 end
 
 local function directory_find_command(root)
@@ -154,3 +155,6 @@ keymap('n', '<leader>fG', function ()
 end, { desc = "Pick directory and live grep" })
 keymap('n', '<leader>fb', ':Telescope buffers<CR>')
 keymap('n', '<leader>fh', ':Telescope help_tags<CR>')
+
+keymap('n', '<leader>gp', require('gitsigns').preview_hunk_inline, { desc = "Preview hunk inline" })
+-- keymap('n', '<leader>gp', require('gitsigns').preview_hunk, { desc = "Preview hunk" })

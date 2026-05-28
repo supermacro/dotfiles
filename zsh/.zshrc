@@ -191,7 +191,10 @@ eval "$(fnm env --use-on-cd --shell zsh)"
 
 # pnpm
 export PNPM_HOME="$HOME/Library/pnpm"
-[[ -d "$PNPM_HOME" ]] && path=("$PNPM_HOME" $path)
+case ":$PATH:" in
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+esac
 # pnpm end
 
 # bob / nvim

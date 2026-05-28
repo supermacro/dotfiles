@@ -1,6 +1,7 @@
 -- ~/.config/nvim-new/lua/lsp.lua
 vim.lsp.enable({
   "bashls",
+  -- "eslint",
   "gopls",
   "lua_ls",
   "texlab",

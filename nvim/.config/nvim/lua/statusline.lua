@@ -65,10 +65,17 @@ end
 Statusline = {}
 
 function Statusline.active()
+    local lsp_references = ""
+    if Statusline.lsp_references_pending then
+        lsp_references = hl(config.placeholder_hl, " refs " .. (Statusline.lsp_references_frame or ""))
+    end
+
     return table.concat {
         "[", filepath(), "%t] ",
         git(),
         "%=",
+        lsp_references,
+        " ",
         "%y [%P %l:%c]"
     }
 end
