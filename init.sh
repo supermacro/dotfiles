@@ -99,20 +99,6 @@ ensure_homebrew() {
     ensure_command "brew" "Homebrew installation failed."
 }
 
-ensure_brew_shellenv_loaded() {
-    if command -v brew >/dev/null 2>&1; then
-        return
-    fi
-
-    if [[ -x /opt/homebrew/bin/brew ]]; then
-        eval "$(/opt/homebrew/bin/brew shellenv)"
-    elif [[ -x /usr/local/bin/brew ]]; then
-        eval "$(/usr/local/bin/brew shellenv)"
-    fi
-
-    ensure_command "brew" "Install Homebrew first, then re-run this script."
-}
-
 brew_install_formula() {
     local formula="$1"
 
@@ -196,8 +182,8 @@ ensure_bob_nightly() {
     fi
 
     info "Installing latest Neovim nightly with bob."
-    bob install nightly
-    bob use nightly
+    # Answer "no" to bob's PATH-modification prompt; .zshrc manages bob's PATH.
+    printf 'no\n' | bob use nightly
 
     if [[ ! -x "$nvim_bin" ]]; then
         error "bob did not produce an executable nvim binary at $nvim_bin"
@@ -223,6 +209,8 @@ ensure_bob_nightly() {
 }
 
 ensure_bob_installed_with_cargo() {
+    [[ -d "$HOME/.cargo/bin" ]] && export PATH="$HOME/.cargo/bin:$PATH"
+
     if command -v bob >/dev/null 2>&1; then
         info "command already installed: bob"
         return
@@ -232,7 +220,6 @@ ensure_bob_installed_with_cargo() {
 
     info "Installing bob with cargo."
     cargo install bob-nvim
-    export PATH="$HOME/.cargo/bin:$PATH"
 
     ensure_command "bob" "bob installation failed."
 }
@@ -268,6 +255,19 @@ ensure_delta_installed_linux() {
     export PATH="$HOME/.cargo/bin:$PATH"
 
     ensure_command "delta" "delta installation failed."
+}
+
+ensure_default_shell_zsh() {
+    local zsh_path
+    zsh_path="$(command -v zsh)"
+
+    if [[ "$SHELL" == "$zsh_path" ]]; then
+        info "Default shell is already zsh."
+        return
+    fi
+
+    info "Setting default shell to zsh."
+    chsh -s "$zsh_path"
 }
 
 ensure_local_env_file() {
@@ -326,30 +326,36 @@ stow_packages() {
     stow --target="$HOME" --restow "${packages[@]}"
 }
 
+# Cross-platform tools. Entries align by index: COMMON_BREW[i] is the brew
+# name for the same logical tool as COMMON_APT[i].
+COMMON_BREW=(
+    git stow tmux fzf tree
+    rg fd shellcheck
+    pkgconf mysql-client
+)
+COMMON_APT=(
+    git stow tmux fzf tree
+    ripgrep fd-find shellcheck
+    pkg-config default-mysql-client
+)
+
 bootstrap_macos() {
     ensure_command "curl" "Install curl via the Xcode Command Line Tools and re-run."
     ensure_command "zsh" "zsh is required on macOS."
 
     ensure_homebrew
-    ensure_brew_shellenv_loaded
 
     info "Updating Homebrew metadata."
     brew update
 
-    brew_install_formula "git"
+    for pkg in "${COMMON_BREW[@]}"; do
+        brew_install_formula "$pkg"
+    done
+
     brew_install_formula "delta"
     brew_install_formula "fnm"
     brew_install_formula "bob"
-    brew_install_formula "stow"
-    brew_install_formula "tmux"
-    brew_install_formula "fzf"
-    brew_install_formula "tree"
-    brew_install_formula "rg"
-    brew_install_formula "fd"
-
-    # mysql deps
-    brew_install_formula "pkgconf"
-    brew_install_formula "mysql-client"
+    brew_install_formula "tree-sitter"
 
     brew_install_cask "kitty"
     brew_install_cask "font-jetbrains-mono-nerd-font"
@@ -360,6 +366,7 @@ bootstrap_macos() {
     ensure_bob_nightly
     ensure_local_env_file
     stow_packages zsh git nvim kitty
+    ensure_default_shell_zsh
 
     info "macOS dotfiles bootstrap complete."
     info "Open a new terminal session to pick up shell changes."
@@ -376,19 +383,16 @@ bootstrap_linux() {
 
     apt_install_package "ca-certificates"
     apt_install_package "curl"
-    apt_install_package "git"
     apt_install_package "zsh"
-    apt_install_package "stow"
-    apt_install_package "tmux"
-    apt_install_package "fzf"
-    apt_install_package "tree"
-    apt_install_package "ripgrep"
-    apt_install_package "fd-find"
-    apt_install_package "pkg-config"
-    apt_install_package "default-mysql-client"
+
+    for pkg in "${COMMON_APT[@]}"; do
+        apt_install_package "$pkg"
+    done
+
     apt_install_package "default-libmysqlclient-dev"
     apt_install_package "build-essential"
     apt_install_package "libssl-dev"
+    apt_install_package "libclang-dev"
     apt_install_package "rustc"
     apt_install_package "cargo"
     apt_install_package "kitty"
@@ -399,9 +403,11 @@ bootstrap_linux() {
     ensure_script_installed_command "uv" "curl -LsSf https://astral.sh/uv/install.sh | sh"
     ensure_script_installed_command "pnpm" "curl -fsSL https://get.pnpm.io/install.sh | sh -"
     ensure_bob_installed_with_cargo
+    ensure_script_installed_command "tree-sitter" "cargo install tree-sitter-cli"
     ensure_bob_nightly
     ensure_local_env_file
     stow_packages zsh git nvim kitty
+    ensure_default_shell_zsh
 
     info "Linux dotfiles bootstrap complete."
     info "Open a new terminal session to pick up shell changes."

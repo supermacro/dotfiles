@@ -39,12 +39,14 @@ local function macos_appearance()
   return "light"
 end
 
-local function system_colorscheme()
-  if macos_appearance() == "light" then
-    return "catppuccin-latte"
-  end
+local function time_of_day_appearance()
+  local hour = tonumber(os.date("%H"))
+  return (hour >= 8 and hour < 20) and "light" or "dark"
+end
 
-  return "catppuccin-mocha"
+local function system_colorscheme()
+  local appearance = macos_appearance() or time_of_day_appearance()
+  return appearance == "light" and "catppuccin-latte" or "catppuccin-mocha"
 end
 
 local function apply_system_theme()

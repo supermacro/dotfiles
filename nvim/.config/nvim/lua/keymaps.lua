@@ -74,7 +74,7 @@ local function live_grep(opts)
     builtin.live_grep(telescope_helpers.with_top_prompt({
         cwd = opts.cwd,
         additional_args = function ()
-            return { "--fixed-strings" }
+            return { "--fixed-strings", "--hidden", "--follow" }
         end,
         layout_config = {
             width = 0.99,
@@ -84,9 +84,18 @@ local function live_grep(opts)
     }))
 end
 
+local function fd_executable()
+    for _, name in ipairs({ "fd", "fdfind" }) do
+        if vim.fn.executable(name) == 1 then
+            return name
+        end
+    end
+end
+
 local function directory_find_command(root)
-    if vim.fn.executable("fd") == 1 then
-        return { "fd", "--type", "d", "--hidden", "--follow", "--exclude", ".git", ".", root }
+    local fd = fd_executable()
+    if fd then
+        return { fd, "--type", "d", "--hidden", "--follow", "--exclude", ".git", ".", root }
     end
 
     return { "find", root, "-type", "d", "-not", "-path", "*/.git/*" }
