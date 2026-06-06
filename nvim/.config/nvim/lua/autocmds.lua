@@ -21,7 +21,7 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.wo.linebreak = true
     vim.wo.showbreak = "↪ "
 
-    if vim.bo[args.buf].filetype == "markdown" then
+    if vim.bo[args.buf].filetype == "markdown" and vim.bo[args.buf].buftype == "" then
       vim.wo.conceallevel = 0
       vim.wo.concealcursor = ""
       vim.wo.colorcolumn = ""
