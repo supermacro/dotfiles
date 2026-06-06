@@ -1,6 +1,6 @@
 # Dotfiles
 
-This repo contains my macOS dotfiles and uses GNU Stow to manage symlinks.
+This repo contains my macOS and Pop!_OS dotfiles and uses GNU Stow to manage symlinks.
 
 ## Layout
 
@@ -27,6 +27,18 @@ On macOS this script will:
 - install Neovim nightly with `bob` and verify the version is `0.12+`
 - create `~/.local/bin/env` if it does not exist
 - back up conflicting files and apply the repo with `stow`
+
+On Pop!_OS/Ubuntu-like Linux this script will:
+
+- install apt dependencies including `git`, `zsh`, `stow`, `tmux`, `fzf`, `ripgrep`, `fd-find`, `cargo`, and `kitty`
+- install `delta` with apt when available, otherwise with Cargo
+- install Oh My Zsh if needed
+- install `fnm`, `uv`, and `pnpm` with their install scripts
+- install `bob` with Cargo, then install Neovim nightly and verify the version is `0.12+`
+- create `~/.local/bin/env` if it does not exist
+- back up conflicting files and apply the repo with `stow`
+
+The bootstrap is idempotent: package installs are skipped when the package or command is already present.
 
 ## Manual Stow Usage
 

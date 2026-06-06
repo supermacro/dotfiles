@@ -139,12 +139,14 @@ nvimconfig() {
 
 vimm() {
   local file
+  local fd_cmd
   local -a fd_excludes=(
     --exclude __pycache__
     --exclude __marimo__
   )
 
-  file="$(fd -I -t f . ${fd_excludes[@]} | fzf)" || return
+  fd_cmd="$(command -v fd || command -v fdfind)" || return
+  file="$("$fd_cmd" -I -t f . ${fd_excludes[@]} | fzf)" || return
   [[ -n "$file" ]] && vi "$file"
 }
 
@@ -166,6 +168,7 @@ run_coplane () {
 goto () {
   local project_root="$HOME/dev"
   local project_dir
+  local fd_cmd
   local -a fd_excludes=(
     --exclude .git
     --exclude node_modules
@@ -173,9 +176,10 @@ goto () {
     --exclude __pycache__
   )
 
+  fd_cmd="$(command -v fd || command -v fdfind)" || return
   project_dir="$(
     cd "$project_root" || return
-    fd -I -t d . ${fd_excludes[@]} |
+    "$fd_cmd" -I -t d . ${fd_excludes[@]} |
       rg -v '(^|/)\.venv(/|$)' |
       awk -F/ 'NF <= 4' |
       fzf
@@ -186,15 +190,27 @@ goto () {
   cd "$project_root/$project_dir"
 }
 
+[[ -d "$HOME/.cargo/bin" ]] && path=("$HOME/.cargo/bin" $path)
+[[ -d "$HOME/.local/share/fnm" ]] && path=("$HOME/.local/share/fnm" $path)
 
-eval "$(fnm env --use-on-cd --shell zsh)"
+if command -v fnm >/dev/null 2>&1; then
+  eval "$(fnm env --use-on-cd --shell zsh)"
+fi
 
 # pnpm
-export PNPM_HOME="$HOME/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME/bin:"*) ;;
-  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
-esac
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  export PNPM_HOME="$HOME/Library/pnpm"
+  case ":$PATH:" in
+    *":$PNPM_HOME/bin:"*) ;;
+    *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+  esac
+else
+  export PNPM_HOME="${PNPM_HOME:-$HOME/.local/share/pnpm}"
+  case ":$PATH:" in
+    *":$PNPM_HOME:"*) ;;
+    *) export PATH="$PNPM_HOME:$PATH" ;;
+  esac
+fi
 # pnpm end
 
 # bob / nvim
@@ -203,6 +219,10 @@ esac
 # ensure no duplicates
 typeset -U path PATH
 
-. "$HOME/.atuin/bin/env"
+if [[ -f "$HOME/.atuin/bin/env" ]]; then
+  . "$HOME/.atuin/bin/env"
+fi
 
-eval "$(atuin init zsh)"
+if command -v atuin >/dev/null 2>&1; then
+  eval "$(atuin init zsh)"
+fi

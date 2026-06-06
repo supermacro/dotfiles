@@ -22,13 +22,6 @@ error() {
     echo -e "[${RED}error${NC}] $1" >&2
 }
 
-require_macos() {
-    if [[ "$(uname -s)" != "Darwin" ]]; then
-        error "This installer only supports macOS."
-        exit 1
-    fi
-}
-
 ensure_command() {
     local command_name="$1"
     local install_hint="$2"
@@ -38,6 +31,53 @@ ensure_command() {
         error "$install_hint"
         exit 1
     fi
+}
+
+ensure_supported_os() {
+    case "$(uname -s)" in
+        Darwin)
+            return
+            ;;
+        Linux)
+            if [[ -r /etc/os-release ]]; then
+                # shellcheck disable=SC1091
+                . /etc/os-release
+                if [[ "${ID:-}" == "pop" || "${ID:-}" == "ubuntu" || "${ID_LIKE:-}" == *"ubuntu"* || "${ID_LIKE:-}" == *"debian"* ]]; then
+                    return
+                fi
+            fi
+            ;;
+    esac
+
+    error "This installer supports macOS and Pop!_OS/Ubuntu-like Linux systems."
+    exit 1
+}
+
+run_apt_get() {
+    if (( EUID == 0 )); then
+        apt-get "$@"
+        return
+    fi
+
+    sudo apt-get "$@"
+}
+
+apt_install_package() {
+    local package="$1"
+
+    if dpkg -s "$package" >/dev/null 2>&1; then
+        info "apt package already installed: $package"
+        return
+    fi
+
+    info "Installing apt package: $package"
+    run_apt_get install -y "$package"
+}
+
+apt_package_available() {
+    local package="$1"
+
+    apt-cache show "$package" >/dev/null 2>&1
 }
 
 ensure_homebrew() {
@@ -140,12 +180,25 @@ ensure_bob_nightly() {
         mkdir -p "$HOME/.local/bin"
     fi
 
+    local nvim_bin
+    nvim_bin="$HOME/.local/share/bob/nvim-bin/nvim"
+    if [[ -x "$nvim_bin" ]]; then
+        local existing_version_output
+        existing_version_output="$("$nvim_bin" --version | head -n 1)"
+        if [[ "$existing_version_output" =~ ^NVIM[[:space:]]v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+            local existing_major="${BASH_REMATCH[1]}"
+            local existing_minor="${BASH_REMATCH[2]}"
+            if (( existing_major > 0 || existing_minor >= 12 )); then
+                info "Neovim already installed with bob: $existing_version_output"
+                return
+            fi
+        fi
+    fi
+
     info "Installing latest Neovim nightly with bob."
     bob install nightly
     bob use nightly
 
-    local nvim_bin
-    nvim_bin="$HOME/.local/share/bob/nvim-bin/nvim"
     if [[ ! -x "$nvim_bin" ]]; then
         error "bob did not produce an executable nvim binary at $nvim_bin"
         exit 1
@@ -167,6 +220,54 @@ ensure_bob_nightly() {
     fi
 
     info "Verified Neovim version: $version_output"
+}
+
+ensure_bob_installed_with_cargo() {
+    if command -v bob >/dev/null 2>&1; then
+        info "command already installed: bob"
+        return
+    fi
+
+    ensure_command "cargo" "Install Rust/Cargo first, then re-run this script."
+
+    info "Installing bob with cargo."
+    cargo install bob-nvim
+    export PATH="$HOME/.cargo/bin:$PATH"
+
+    ensure_command "bob" "bob installation failed."
+}
+
+ensure_fnm_installed_with_script() {
+    if command -v fnm >/dev/null 2>&1; then
+        info "command already installed: fnm"
+        return
+    fi
+
+    info "Installing fnm."
+    sh -c "curl -fsSL https://fnm.vercel.app/install | sh -s -- --skip-shell"
+    export PATH="$HOME/.local/share/fnm:$PATH"
+
+    ensure_command "fnm" "fnm installation failed."
+}
+
+ensure_delta_installed_linux() {
+    if command -v delta >/dev/null 2>&1; then
+        info "command already installed: delta"
+        return
+    fi
+
+    if apt_package_available "git-delta"; then
+        apt_install_package "git-delta"
+        return
+    fi
+
+    ensure_command "cargo" "Install Rust/Cargo first, then re-run this script."
+
+    info "Installing delta with cargo."
+    cargo install git-delta
+    export PATH="$HOME/.cargo/bin:$PATH"
+
+    ensure_command "delta" "delta installation failed."
 }
 
 ensure_local_env_file() {
@@ -211,18 +312,21 @@ prepare_stow_target() {
 }
 
 stow_packages() {
+    local packages=("$@")
+
     prepare_stow_target "$HOME/.zshrc"
     prepare_stow_target "$HOME/.gitconfig"
     prepare_stow_target "$HOME/.config/nvim"
-    prepare_stow_target "$HOME/.config/kitty"
+
+    if [[ " ${packages[*]} " == *" kitty "* ]]; then
+        prepare_stow_target "$HOME/.config/kitty"
+    fi
 
     info "Applying dotfiles with stow."
-    stow --target="$HOME" --restow zsh git nvim kitty
+    stow --target="$HOME" --restow "${packages[@]}"
 }
 
-main() {
-    require_macos
-
+bootstrap_macos() {
     ensure_command "curl" "Install curl via the Xcode Command Line Tools and re-run."
     ensure_command "zsh" "zsh is required on macOS."
 
@@ -255,10 +359,65 @@ main() {
     ensure_script_installed_command "pnpm" "curl -fsSL https://get.pnpm.io/install.sh | sh -"
     ensure_bob_nightly
     ensure_local_env_file
-    stow_packages
+    stow_packages zsh git nvim kitty
 
     info "macOS dotfiles bootstrap complete."
     info "Open a new terminal session to pick up shell changes."
+}
+
+bootstrap_linux() {
+    if (( EUID != 0 )); then
+        ensure_command "sudo" "Install sudo or run this script as root."
+    fi
+    ensure_command "apt-get" "Pop!_OS/Ubuntu apt-get is required."
+
+    info "Updating apt metadata."
+    run_apt_get update
+
+    apt_install_package "ca-certificates"
+    apt_install_package "curl"
+    apt_install_package "git"
+    apt_install_package "zsh"
+    apt_install_package "stow"
+    apt_install_package "tmux"
+    apt_install_package "fzf"
+    apt_install_package "tree"
+    apt_install_package "ripgrep"
+    apt_install_package "fd-find"
+    apt_install_package "pkg-config"
+    apt_install_package "default-mysql-client"
+    apt_install_package "default-libmysqlclient-dev"
+    apt_install_package "build-essential"
+    apt_install_package "libssl-dev"
+    apt_install_package "rustc"
+    apt_install_package "cargo"
+    apt_install_package "kitty"
+
+    ensure_delta_installed_linux
+    ensure_oh_my_zsh
+    ensure_fnm_installed_with_script
+    ensure_script_installed_command "uv" "curl -LsSf https://astral.sh/uv/install.sh | sh"
+    ensure_script_installed_command "pnpm" "curl -fsSL https://get.pnpm.io/install.sh | sh -"
+    ensure_bob_installed_with_cargo
+    ensure_bob_nightly
+    ensure_local_env_file
+    stow_packages zsh git nvim kitty
+
+    info "Linux dotfiles bootstrap complete."
+    info "Open a new terminal session to pick up shell changes."
+}
+
+main() {
+    ensure_supported_os
+
+    case "$(uname -s)" in
+        Darwin)
+            bootstrap_macos
+            ;;
+        Linux)
+            bootstrap_linux
+            ;;
+    esac
 }
 
 main "$@"
