@@ -74,7 +74,7 @@ local function live_grep(opts)
     builtin.live_grep(telescope_helpers.with_top_prompt({
         cwd = opts.cwd,
         additional_args = function ()
-            return { "--fixed-strings", "--hidden", "--follow" }
+            return { "--fixed-strings", "--hidden", "--follow", "--glob", "!**/.git/**" }
         end,
         layout_config = {
             width = 0.99,

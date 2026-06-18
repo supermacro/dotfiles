@@ -4,6 +4,7 @@ vim.lsp.enable({
   -- "eslint",
   "gopls",
   "lua_ls",
+  "tailwindcss",
   "texlab",
   "ts_ls",
   "ty",

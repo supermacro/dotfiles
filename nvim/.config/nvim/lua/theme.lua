@@ -22,6 +22,7 @@ require("catppuccin").setup({
       ["@markup.italic"] = { fg = colors.flamingo, style = { "italic" } },
       ["@markup.strong"] = { fg = colors.maroon, style = { "bold" } },
       ["@markup.strikethrough"] = { fg = colors.overlay1, style = { "strikethrough" } },
+      CursorLineNr = { fg = colors.base, bg = colors.blue, style = { "bold" } },
     }
   end,
 })
